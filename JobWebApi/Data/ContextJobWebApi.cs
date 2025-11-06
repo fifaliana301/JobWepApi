@@ -89,6 +89,8 @@ namespace JobWebApi.Data
                       .WithMany()
                       .HasForeignKey(e => new { e.NumeroVersion, e.CodeLogiciel });
             });
+
+            JeuDonnées.Créer(modelBuilder);
         }
     }
 }
