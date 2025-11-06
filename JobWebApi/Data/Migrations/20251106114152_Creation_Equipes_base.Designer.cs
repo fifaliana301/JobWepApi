@@ -4,6 +4,7 @@ using JobWebApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobWebApi.Data.Migrations
 {
     [DbContext(typeof(ContextJobWebApi))]
-    partial class ContextJobWebApiModelSnapshot : ModelSnapshot
+    [Migration("20251106114152_Creation_Equipes_base")]
+    partial class Creation_Equipes_base
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

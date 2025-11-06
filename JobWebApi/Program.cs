@@ -20,6 +20,7 @@ namespace JobWebApi
                 options.UseSqlServer(connect));
 
             builder.Services.AddScoped<IServiceLogiciels, ServiceLogiciels>();
+            builder.Services.AddScoped<IServiceEquipes, ServiceEquipes>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

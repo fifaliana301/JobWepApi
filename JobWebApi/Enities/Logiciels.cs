@@ -4,6 +4,9 @@
     {
         public string Code { get; set; } = "";
         public string Nom { get; set; } = "";
+
+        // Propriété de navigation
+        public virtual List<Equipe> Equipes { get; set; } = new();
     }
 
     public class Logiciel
