@@ -15,7 +15,8 @@
 
         // Propriétés de navigation
         public virtual List<Personne> Personnes { get; set; } = new();
-        public virtual Service Service { get; set; } = null!;
+        //public virtual Service Service { get; set; } = null!;
+        public virtual Service Service { get; set; } = new();
     }
 
     public class Personne
@@ -30,7 +31,8 @@
         public string? Manager { get; set; }
 
         // Propriétés de navigation
-        public virtual Metier Métier { get; set; } = null!;
+        //public virtual Metier Métier { get; set; } = null!;
+        public virtual Metier Métier { get; set; } = new();
     }
 
     public class Metier

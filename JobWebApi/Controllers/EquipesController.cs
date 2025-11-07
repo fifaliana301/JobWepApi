@@ -33,5 +33,27 @@ namespace JobWebApi.Controllers
             if (équipe == null) return NotFound();
             return Ok(équipe);
         }
+
+        // POST: api/Filieres/BIOV/Equipes
+        [HttpPost]
+        public async Task<ActionResult<Equipe>> PostEquipe(string codeFiliere, Equipe eq)
+        {
+            Equipe res = await _service.AjouterEquipe(codeFiliere, eq);
+
+            // Renvoie une réponse de code 201 avec l'en-tête 
+            // "location: <url d'accès à l’équipe>" et un corps contenant l’équipe
+            return CreatedAtAction(nameof(GetEquipe), new { codeFiliere = res.CodeFiliere, codeEquipe = res.Code }, res); ;
+        }
+
+        // POST: api/Filieres/BIOV/Equipes/BIOV_MKT
+        [HttpPost("{codeEquipe}")]
+        public async Task<ActionResult<Equipe>> PostPersonne(string codeFiliere, string codeEquipe, Personne pers)
+        {
+            Personne res = await _service.AjouterPersonne(codeEquipe, pers);
+
+            // Renvoie une réponse de code 201 avec l'en-tête 
+            // "location: <url d'accès à l’équipe de la personne>" et un corps contenant l’équipe
+            return CreatedAtAction(nameof(GetEquipe), new { codeFiliere, codeEquipe }, res);
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace JobWebApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Logiciels
             modelBuilder.Entity<Filiere>(entity =>
             {
                 entity.HasKey(e => e.Code);
@@ -38,12 +39,9 @@ namespace JobWebApi.Data
                 entity.Property(e => e.Code).HasMaxLength(20).IsUnicode(false);
                 entity.Property(e => e.CodeFiliere).HasMaxLength(20).IsUnicode(false);
                 entity.Property(e => e.Nom).HasMaxLength(60).IsUnicode(false);
-                // Ici le logiciel appartient a une filiere , logicile est l'enfant
-                entity.HasOne<Filiere>()
-                      .WithMany()
-                      .HasForeignKey(e => e.CodeFiliere)
-                      .OnDelete(DeleteBehavior.NoAction);
 
+                entity.HasOne<Filiere>().WithMany().HasForeignKey(d => d.CodeFiliere)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Module>(entity =>
@@ -56,14 +54,12 @@ namespace JobWebApi.Data
                 entity.Property(e => e.CodeModuleParent).HasMaxLength(20).IsUnicode(false);
                 entity.Property(e => e.Nom).HasMaxLength(60).IsUnicode(false);
 
-                entity.HasOne<Logiciel>()
-                      .WithMany()
-                      .HasForeignKey(e => e.CodeLogiciel)
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne<Logiciel>().WithMany(l => l.Modules).HasForeignKey(d => d.CodeLogiciel)
+                            .OnDelete(DeleteBehavior.NoAction);
 
-                entity.HasOne<Module>().WithMany()
-                      .HasForeignKey(e => new { e.CodeModuleParent, e.CodeLogicielParent })
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne<Module>().WithMany(m => m.SousModules)
+                        .HasForeignKey(d => new { d.CodeModuleParent, d.CodeLogicielParent })
+                        .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Versions>(entity =>
@@ -76,10 +72,8 @@ namespace JobWebApi.Data
                 entity.Property(e => e.DateSortiePrevue);
                 entity.Property(e => e.DateSortieReelle);
 
-                entity.HasOne<Logiciel>()
-                      .WithMany()
-                      .HasForeignKey(e => e.CodeLogiciel)
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne<Logiciel>().WithMany().HasForeignKey(d => d.CodeLogiciel)
+                        .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Release>(entity =>
@@ -90,10 +84,11 @@ namespace JobWebApi.Data
                 entity.Property(e => e.CodeLogiciel).HasMaxLength(20).IsUnicode(false);
                 entity.Property(e => e.DatePubli);
 
-                entity.HasOne<Versions>()
-                      .WithMany()
-                      .HasForeignKey(e => new { e.NumeroVersion, e.CodeLogiciel });
+                entity.HasOne<Versions>().WithMany(v => v.Releases)
+                        .HasForeignKey(d => new { d.NumeroVersion, d.CodeLogiciel });
             });
+
+            #endregion
 
             #region Equipes
             modelBuilder.Entity<Service>(entity =>

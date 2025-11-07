@@ -1,13 +1,7 @@
-﻿using JobWebApi.Data;
-using JobWebApi.Enities;
+﻿using JobWebApi.Enities;
 using JobWebApi.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace JobWebApi.Controllers
 {
@@ -41,6 +35,55 @@ namespace JobWebApi.Controllers
             }
 
             return logiciel;
+        }
+
+        // GET: Logiciels/GENOMICA/versions?millesime=2023
+        [HttpGet("{codeLogiciel}/versions")]
+        public async Task<ActionResult<IEnumerable<Version>>> GetVersions(string codeLogiciel, [FromQuery] int? millesime)
+        {
+            var versions = await _serviceLogi.ObtenirVersionsLogiciel(codeLogiciel, millesime);
+
+            if (versions == null) return NotFound();
+
+            return Ok(versions);
+        }
+
+        // GET : api/Logiciels/GENOMICA/Versions/1.00/Releases/30
+        [HttpGet("{codeLogiciel}/Versions/{numVersion}/Releases/{numRelease}")]
+        public async Task<ActionResult<IEnumerable<Version>>> GetRelease(string codeLogiciel, float numVersion, short numRelease)
+        {
+            var release = await _serviceLogi.ObtenirRelease(codeLogiciel, numVersion, numRelease);
+
+            if (release == null) return NotFound();
+
+            return Ok(release);
+        }
+
+        // POST : api/Logiciels/GENOMICA/Versions/1.00/Releases
+        [HttpPost("{codeLogiciel}/Versions/{numVersion}/Releases")]
+        public async Task<ActionResult<Release>> PostRelease(string codeLogiciel, float numVersion, [FromForm] FormRelease fr)
+        {
+            // Crée une entité du modèle à partir de l'entité DTO 
+            // cela permet de transmettre le doonnées de FormRelease dans Release ordinnaires
+            Release rel = new Release()
+            {
+                CodeLogiciel = codeLogiciel,
+                NumeroVersion = numVersion,
+                Numero = fr.Numero,
+                DatePubli = fr.DatePubli
+            };
+
+            if (fr.Notes != null)
+            {
+                using StreamReader reader = new(fr.Notes.OpenReadStream());
+                rel.Notes = await reader.ReadToEndAsync();
+            }
+
+            Release res = await _serviceLogi.AjouterRelease(codeLogiciel, numVersion, rel);
+
+            object clé = new { codeLogiciel = res.CodeLogiciel, numVersion = res.NumeroVersion, numRelease = res.Numero };
+            string uri = Url.Action(nameof(GetRelease), clé) ?? "";
+            return Created(uri, res);
         }
     }
 }

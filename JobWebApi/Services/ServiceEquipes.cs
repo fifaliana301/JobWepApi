@@ -8,6 +8,8 @@ namespace JobWebApi.Services
     {
         Task<List<Equipe>> ObtenirEquipes(string codeFilière);
         Task<Equipe?> ObtenirEquipe(string codeFilière, string codeEquipe);
+        Task<Equipe> AjouterEquipe(string codeFilière, Equipe équipe);
+        Task<Personne> AjouterPersonne(string codeEquipe, Personne personne);
     }
     public class ServiceEquipes : IServiceEquipes
     {
@@ -37,6 +39,34 @@ namespace JobWebApi.Services
                       select e;
 
             return await req.FirstOrDefaultAsync();
+        }
+
+        // Ajoute une équipe avec des personnes dans une filière donnée
+        public async Task<Equipe> AjouterEquipe(string codeFilière, Equipe équipe)
+        {
+            équipe.CodeFiliere = codeFilière;
+            équipe.Service = null!;
+            foreach (Personne p in équipe.Personnes)
+            {
+                p.Métier = null!;
+            }
+            _context.Equipes.Add(équipe);
+
+            await _context.SaveChangesAsync();
+
+            return équipe;
+        }
+
+        // Ajoute une personne dans une équipe donnée
+        public async Task<Personne> AjouterPersonne(string codeEquipe, Personne personne)
+        {
+            personne.CodeEquipe = codeEquipe;
+            personne.Métier = null!;
+
+            _context.Personnes.Add(personne);
+            await _context.SaveChangesAsync();
+
+            return personne;
         }
     }
 }

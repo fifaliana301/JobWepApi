@@ -14,6 +14,8 @@
         public string Code { get; set; } = "";
         public string CodeFiliere { get; set; } = "";
         public string Nom { get; set; } = "";
+        // Propriétés de navigation
+        public virtual List<Module> Modules { get; set; } = new();
     }
 
     public class Module
@@ -24,6 +26,8 @@
 
         public string? CodeModuleParent { get; set; }
         public string? CodeLogicielParent { get; set; }
+        // Propriété de navigation
+        public virtual List<Module> SousModules { get; set; } = new();
     }
 
     public class Versions
@@ -34,6 +38,10 @@
         public DateTime DateOuverture { get; set; }
         public DateTime DateSortiePrevue { get; set; }
         public DateTime? DateSortieReelle { get; set; }
+        public string? Notes { get; set; }
+
+        // Propriété de navigation
+        public virtual List<Release> Releases { get; set; } = new();
     }
 
     public class Release
@@ -42,5 +50,6 @@
         public float NumeroVersion { get; set; }
         public string CodeLogiciel { get; set; } = "";
         public DateTime DatePubli { get; set; }
+        public string? Notes { get; set; }
     }
 }
