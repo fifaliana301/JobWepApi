@@ -10,10 +10,12 @@ namespace JobWebApi.Controllers
     public class LogicielsController : ControllerBase
     {
         private readonly IServiceLogiciels _serviceLogi;
+        private readonly ILogger<LogicielsController> _logger;
 
-        public LogicielsController(IServiceLogiciels service)
+        public LogicielsController(IServiceLogiciels service, ILogger<LogicielsController> logger)
         {
             _serviceLogi = service;
+            _logger = logger;
         }
 
         // GET: api/Logiciels
@@ -78,12 +80,19 @@ namespace JobWebApi.Controllers
                 using StreamReader reader = new(fr.Notes.OpenReadStream());
                 rel.Notes = await reader.ReadToEndAsync();
             }
+            try
+            {
+                Release res = await _serviceLogi.AjouterRelease(codeLogiciel, numVersion, rel);
 
-            Release res = await _serviceLogi.AjouterRelease(codeLogiciel, numVersion, rel);
+                object clé = new { codeLogiciel = res.CodeLogiciel, numVersion = res.NumeroVersion, numRelease = res.Numero };
+                string uri = Url.Action(nameof(GetRelease), clé) ?? "";
+                return Created(uri, res);
+            }
+            catch (Exception e)
+            {
+                return this.CustomResponseForError(e, rel, _logger);
 
-            object clé = new { codeLogiciel = res.CodeLogiciel, numVersion = res.NumeroVersion, numRelease = res.Numero };
-            string uri = Url.Action(nameof(GetRelease), clé) ?? "";
-            return Created(uri, res);
+            }
         }
     }
 }

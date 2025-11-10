@@ -17,7 +17,7 @@ namespace JobWebApi
 
             // Enregistre ton DbContext dans le conteneur DI
             builder.Services.AddDbContext<ContextJobWebApi>(options =>
-                options.UseSqlServer(connect));
+                options.UseSqlServer(connect).EnableSensitiveDataLogging());
 
             builder.Services.AddScoped<IServiceLogiciels, ServiceLogiciels>();
             builder.Services.AddScoped<IServiceEquipes, ServiceEquipes>();
