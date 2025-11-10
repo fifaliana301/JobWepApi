@@ -1,4 +1,5 @@
 ﻿using JobWebApi.Data;
+using JobWebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
@@ -16,6 +17,11 @@ namespace JobWebApi.Controllers
             {
                 ProblemDetails pb = dbe.ConvertToProblemDetails();
                 return controller.Problem(pb.Detail, null, pb.Status, pb.Title);
+            }
+            else if (e is ValidationRulesException vre)
+            {
+                ValidationProblemDetails vpd = new(vre.Errors);
+                return controller.ValidationProblem(vpd);
             }
             else throw e;
         }
@@ -35,6 +41,11 @@ namespace JobWebApi.Controllers
                     JsonSerializer.Serialize(entity, new JsonSerializerOptions { WriteIndented = true }));
 
                 return controller.Problem(pb.Detail, null, pb.Status, pb.Title);
+            }
+            else if (e is ValidationRulesException vre)
+            {
+                ValidationProblemDetails vpd = new(vre.Errors);
+                return controller.ValidationProblem(vpd);
             }
             else throw e;
         }

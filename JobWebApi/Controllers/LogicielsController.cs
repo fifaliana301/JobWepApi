@@ -50,6 +50,21 @@ namespace JobWebApi.Controllers
             return Ok(versions);
         }
 
+        // POST: api/Logiciels/GENOMICA
+        [HttpPost("{codeLogiciel}/versions")]
+        public async Task<ActionResult<Versions>> PostVersion(string codeLogiciel, Versions vers)
+        {
+            try
+            {
+                Versions res = await _serviceLogi.AjouterVersion(codeLogiciel, vers);
+                return CreatedAtAction(nameof(GetVersions), new { codeLogiciel, res.Millesime }, res);
+            }
+            catch (Exception e)
+            {
+                return this.CustomResponseForError(e);
+            }
+        }
+
         // GET : api/Logiciels/GENOMICA/Versions/1.00/Releases/30
         [HttpGet("{codeLogiciel}/Versions/{numVersion}/Releases/{numRelease}")]
         public async Task<ActionResult<IEnumerable<Version>>> GetRelease(string codeLogiciel, float numVersion, short numRelease)
