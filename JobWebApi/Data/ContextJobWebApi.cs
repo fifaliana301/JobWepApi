@@ -21,6 +21,11 @@ namespace JobWebApi.Data
         public virtual DbSet<Personne> Personnes { get; set; }
         public virtual DbSet<Metier> Métiers { get; set; }
 
+        public virtual DbSet<Activite> Activites { get; set; }
+        public virtual DbSet<ActiviteMetier> ActivitesMetiers { get; set; }
+        public virtual DbSet<Tache> Taches { get; set; }
+        public virtual DbSet<Travail> Travaux { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region Logiciels
@@ -157,7 +162,54 @@ namespace JobWebApi.Data
             });
             #endregion
 
-            JeuDonnées.Créer(modelBuilder);
+            #region Taches
+            modelBuilder.Entity<Activite>(entity =>
+            {
+                entity.HasKey(e => e.Code);
+
+                entity.Property(e => e.Code).HasMaxLength(20).IsUnicode(false);
+                entity.Property(e => e.Titre).HasMaxLength(60);
+
+                entity.HasMany<Metier>().WithMany().UsingEntity<ActiviteMetier>(
+                    l => l.HasOne<Metier>().WithMany().HasForeignKey(am => am.CodeMetier),
+                    r => r.HasOne<Activite>().WithMany().HasForeignKey(am => am.CodeActivite));
+            });
+
+            modelBuilder.Entity<Tache>(entity =>
+            {
+                entity.Property(e => e.Titre).HasMaxLength(60);
+                entity.Property(e => e.DureePrevue).HasColumnType("decimal(3, 1)");
+                entity.Property(e => e.DureeRestante).HasColumnType("decimal(3, 1)");
+                entity.Property(e => e.Description).HasMaxLength(1000);
+
+                entity.HasOne<Activite>().WithMany().HasForeignKey(d => d.CodeActivite)
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne<Personne>().WithMany().HasForeignKey(d => d.Personne)
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne<Module>().WithMany().HasForeignKey(d => new { d.CodeModule, d.CodeLogiciel })
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne<Versions>().WithMany().HasForeignKey(d => new { d.NumVersion, d.CodeLogiciel })
+                        .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Travail>(entity =>
+            {
+                entity.HasKey(e => new { e.DateTravail, e.IdTache });
+
+                entity.Property(e => e.Heures).HasColumnType("decimal(3, 1)");
+                entity.Property(e => e.TauxProductivite).HasColumnType("decimal(3, 2)").HasDefaultValue(1m);
+
+                entity.HasOne<Tache>().WithMany().HasForeignKey(d => d.IdTache);
+            });
+            #endregion
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                JeuDonnées.Créer(modelBuilder);
+            }
         }
     }
 }
