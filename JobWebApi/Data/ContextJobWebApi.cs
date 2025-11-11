@@ -202,7 +202,10 @@ namespace JobWebApi.Data
                 entity.Property(e => e.Heures).HasColumnType("decimal(3, 1)");
                 entity.Property(e => e.TauxProductivite).HasColumnType("decimal(3, 2)").HasDefaultValue(1m);
 
-                entity.HasOne<Tache>().WithMany().HasForeignKey(d => d.IdTache);
+                entity.HasOne(t => t.Tache)        
+                        .WithMany(t => t.Travaux)      
+                        .HasForeignKey(t => t.IdTache) 
+                        .OnDelete(DeleteBehavior.NoAction);
             });
             #endregion
 

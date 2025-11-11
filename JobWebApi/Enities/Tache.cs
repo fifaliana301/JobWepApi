@@ -6,6 +6,8 @@
         public int IdTache { get; set; }
         public decimal Heures { get; set; }
         public decimal TauxProductivite { get; set; }
+
+        public Tache? Tache { get; set; }
     }
 
     public class Tache
@@ -20,6 +22,8 @@
         public string CodeModule { get; set; } = "";
         public float NumVersion { get; set; }
         public string? Description { get; set; }
+
+        public virtual List<Travail> Travaux { get; set; } = new();
     }
 
     public class Activite
