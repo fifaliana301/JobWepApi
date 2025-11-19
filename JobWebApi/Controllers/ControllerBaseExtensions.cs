@@ -2,6 +2,7 @@
 using JobWebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -13,7 +14,11 @@ namespace JobWebApi.Controllers
         // Permet de renvoyer différents types de réponses HTTP 
         public static ActionResult CustomResponseForError(this ControllerBase controller, Exception e)
         {
-            if (e is DbUpdateException dbe)
+            if (e is DbUpdateConcurrencyException)
+            {
+                return controller.Problem("L'entité ou au moins l'une de ses entités filles n'existe pas en base.", null, (int)HttpStatusCode.NotFound, "Aucune modification enregistrée en base.");
+            }
+            else if (e is DbUpdateException dbe)
             {
                 ProblemDetails pb = dbe.ConvertToProblemDetails();
                 return controller.Problem(pb.Detail, null, pb.Status, pb.Title);
@@ -31,7 +36,12 @@ namespace JobWebApi.Controllers
         public static ActionResult CustomResponseForError<T>(this ControllerBase controller,
             Exception e, T entity, ILogger logger, [CallerMemberName] string? action = null)
         {
-            if (e is DbUpdateException dbe)
+            if (e is DbUpdateConcurrencyException)
+            {
+                return controller.Problem("L'entité ou au moins l'une de ses entités filles n'existe pas en base.",
+                    null, (int)HttpStatusCode.NotFound, "Aucune modification enregistrée en base.");
+            }
+            else if (e is DbUpdateException dbe)
             {
                 ProblemDetails pb = dbe.ConvertToProblemDetails();
                 logger.LogWarning("Action {action}, entité de type {type}\n{détail}\n{entity}",

@@ -64,7 +64,7 @@ namespace JobWebApi.Controllers
             }
         }
 
-        // POST: api/Taches/5/Travaux
+        // POST: api/Taches/45/Travaux
         [HttpPost("{idTache}/Travaux")]
         public async Task<IActionResult> PostTravail([FromRoute] int idTache, Travail travail)
         {
@@ -72,6 +72,37 @@ namespace JobWebApi.Controllers
             {
                 Travail res = await _serviceTaches.AjouterTravail(idTache, travail);
                 return CreatedAtAction(nameof(GetTache), new { id = res.IdTache }, res);
+            }
+            catch (Exception e)
+            {
+                return this.CustomResponseForError(e);
+            }
+        }
+
+        // DELETE: api/Taches/45/Travaux/2023-11-23
+        [HttpDelete("{idTache}/Travaux/{date}")]
+        public async Task<IActionResult> DeleteTravail(int idTache, DateTime date)
+        {
+            try
+            {
+                await _serviceTaches.SupprimerTravail(idTache, date);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return this.CustomResponseForError(e);
+            }
+        }
+
+        // DELETE: api/Taches?personne=RBEAUMONT&logiciel=ANATOMIA&version=6
+        [HttpDelete]
+        public async Task<IActionResult> DeleteTaches(
+            [FromQuery] string? personne, [FromQuery] string? logiciel, [FromQuery] float? version)
+        {
+            try
+            {
+                int nbSuppr = await _serviceTaches.SupprimerTaches(personne, logiciel, version);
+                return Ok(nbSuppr + " tâches supprimées");
             }
             catch (Exception e)
             {

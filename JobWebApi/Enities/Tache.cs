@@ -1,4 +1,6 @@
-﻿namespace JobWebApi.Enities
+﻿using System.Text.Json.Serialization;
+
+namespace JobWebApi.Enities
 {
     public class Travail
     {
@@ -7,6 +9,7 @@
         public decimal Heures { get; set; }
         public decimal TauxProductivite { get; set; }
 
+        [JsonIgnore]
         public Tache? Tache { get; set; }
     }
 
